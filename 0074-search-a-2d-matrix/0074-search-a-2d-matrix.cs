@@ -1,50 +1,31 @@
 public class Solution {
     public bool SearchMatrix(int[][] matrix, int target)
     {
-        int l = 0;
-        int r = matrix.Length - 1;
+        int n = matrix.Length;
+        int m = matrix[0].Length;
 
-        while (l <= r)
+        int i = 0;
+        int j = 0;
+
+        while (true)
         {
-            var m = l + (r - l) / 2;
-
-            var row = matrix[m];
-
-            switch (row[0] - target)
+            if (matrix[i][j] == target)
             {
-                case > 0:
-                    r = m - 1;
-                    break;
-                case < 0:
-                    switch (row[^1] - target)
-                    {
-                        case > 0:
-                            l = 0;
-                            r = row.Length - 1;
+                return true;
+            }
 
-                            while (l <= r)
-                            {
-                                int mm = l + (r - l) / 2;
-
-                                if (row[mm] == target) return true;
-                                if (row[mm] < target)
-                                    l = mm + 1;
-                                else
-                                    r = mm - 1;
-                            }
-                            return false;
-                        case < 0:
-                            l = m + 1;
-                            break;
-                        default:
-                            return true;
-                    }
-                    break;
-
-                default: return true;
+            if (i + 1 < n && matrix[i + 1][j] <= target)
+            {
+                i++;
+            }
+            else if (j + 1 < m && matrix[i][j + 1] <= target)
+            {
+                j++;
+            }
+            else
+            {
+                return false;
             }
         }
-
-        return false;
     }
 }
