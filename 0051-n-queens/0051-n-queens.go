@@ -13,10 +13,10 @@ func solveNQueens(n int) (res [][]string) {
 	leftdiag := make(map[int]bool, n)
 	rightdiag := make(map[int]bool, n)
 
-	var solve func(int, int)
+	var solve func(int)
 
-	solve = func(r, queens int) {
-		if queens == 0 {
+	solve = func(r int) {
+		if r == n {
 			b := make([]string, 0, n)
 			for _, r := range board {
 				b = append(b, string(r))
@@ -25,31 +25,27 @@ func solveNQueens(n int) (res [][]string) {
 			return
 		}
 
-		if r == n {
-			return
-		}
-
 		for c := 0; c < n; c++ {
 			rd := c - r
 			ld := n - c - r
 
 			if !col[c] && !leftdiag[ld] && !rightdiag[rd] {
+				board[r][c] = 'Q'
 				col[c] = true
 				leftdiag[ld] = true
 				rightdiag[rd] = true
-				board[r][c] = 'Q'
 
-				solve(r+1, queens-1)
+				solve(r+1)
 
+				board[r][c] = '.'
 				col[c] = false
 				leftdiag[ld] = false
 				rightdiag[rd] = false
-				board[r][c] = '.'
 			}
 		}
 	}
 
-	solve(0, n)
+	solve(0)
 
 	return
 }
