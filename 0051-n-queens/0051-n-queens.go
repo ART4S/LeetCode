@@ -9,7 +9,6 @@ func solveNQueens(n int) (res [][]string) {
 		}
 	}
 
-	row := make(map[int]bool, n)
 	col := make(map[int]bool, n)
 	leftdiag := make(map[int]bool, n)
 	rightdiag := make(map[int]bool, n)
@@ -34,8 +33,7 @@ func solveNQueens(n int) (res [][]string) {
 			rd := c - r
 			ld := n - c - r
 
-			if !row[r] && !col[c] && !leftdiag[ld] && !rightdiag[rd] {
-				row[r] = true
+			if !col[c] && !leftdiag[ld] && !rightdiag[rd] {
 				col[c] = true
 				leftdiag[ld] = true
 				rightdiag[rd] = true
@@ -43,7 +41,6 @@ func solveNQueens(n int) (res [][]string) {
 
 				solve(r+1, queens-1)
 
-				row[r] = false
 				col[c] = false
 				leftdiag[ld] = false
 				rightdiag[rd] = false
