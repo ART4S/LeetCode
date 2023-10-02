@@ -1,58 +1,42 @@
 func minInterval(intervals [][]int, queries []int) []int {
-	const (
-		interval = -1
-		query    = 1
-	)
-
-	type event struct {
-		eventType int
-		start     int
-		finish    int
-	}
-
-	events := make([]*event, 0, len(intervals)+len(queries))
-
-	for _, i := range intervals {
-		events = append(events, &event{eventType: interval, start: i[0], finish: i[1]})
-	}
-
-	for i, q := range queries {
-		events = append(events, &event{eventType: query, start: q, finish: i})
-	}
-
-	sort.SliceStable(events, func(i, j int) bool {
-		switch c := events[i].start - events[j].start; {
-		case c < 0:
-			return true
-		case c > 0:
-			return false
-		default:
-			return events[i].eventType < events[j].eventType
-		}
+	sort.Slice(intervals, func(i, j int) bool {
+		return intervals[i][0] < intervals[j][0]
 	})
 
-	minHeap := NewPriorityQueue[*event]()
+	sortqueries := make([][]int, len(queries))
 
-	for _, e := range events {
-		switch e.eventType {
-		case interval:
-			minHeap.Push(e, e.finish-e.start+1)
-		case query:
-			for minHeap.Len() > 0 {
-				he, _ := minHeap.Peek()
-				if he.finish < e.start {
-					minHeap.Pop()
-				} else {
-					break
-				}
-			}
+	for i := range queries {
+		sortqueries[i] = []int{queries[i], i}
+	}
 
-			if minHeap.Len() > 0 {
-				_, sz := minHeap.Peek()
-				queries[e.finish] = sz
+	sort.Slice(sortqueries, func(i, j int) bool {
+		return sortqueries[i][0] < sortqueries[j][0]
+	})
+
+	pq := NewPriorityQueue[[]int]()
+
+	for q, i := 0, 0; q < len(sortqueries); q++ {
+		query, qindex := sortqueries[q][0], sortqueries[q][1]
+
+		for i < len(intervals) && intervals[i][0] <= query {
+			pq.Push(intervals[i], intervals[i][1]-intervals[i][0]+1)
+			i++
+		}
+
+		for pq.Len() > 0 {
+			in, _ := pq.Peek()
+
+			if query > in[1] || query < in[0] {
+				pq.Pop()
 			} else {
-				queries[e.finish] = -1
+				break
 			}
+		}
+
+		if pq.Len() > 0 {
+			_, queries[qindex] = pq.Peek()
+		} else {
+			queries[qindex] = -1
 		}
 	}
 
@@ -83,7 +67,7 @@ func NewPriorityQueue[TKey any]() PriorityQueue[TKey] {
 func (this *priorityQueue[TKey]) Push(key TKey, priority int) {
 	this.items = append(this.items, &item[TKey]{key, priority})
 
-	heapify_up(this, len(this.items)-1)
+	this.heapify_up(len(this.items) - 1)
 }
 
 func (this *priorityQueue[TKey]) Peek() (TKey, int) {
@@ -106,7 +90,7 @@ func (this *priorityQueue[TKey]) Len() int {
 	return len(this.items)
 }
 
-func heapify_up[TKey any](this *priorityQueue[TKey], i int) {
+func (this *priorityQueue[TKey]) heapify_up(i int) {
 	for i != 0 {
 		parent := (i - 1) / 2
 		if this.less(i, parent) {
@@ -203,6 +187,7 @@ type Queue[T any] interface {
 	Peek() T
 	Pop() T
 	Len() int
+	Items() []T
 }
 
 type queue[T any] struct {
@@ -231,12 +216,19 @@ func (this *queue[T]) Len() int {
 	return len(this.items)
 }
 
+func (this *queue[T]) Items() []T {
+	res := make([]T, len(this.items))
+	copy(res, this.items)
+	return res
+}
+
 // ----------------------------------Stack---------------------------------------
 type Stack[T any] interface {
 	Push(item T)
 	Peek() T
 	Pop() T
 	Len() int
+	Items() []T
 }
 
 type stack[T any] struct {
@@ -265,12 +257,18 @@ func (this *stack[T]) Len() int {
 	return len(this.items)
 }
 
+func (this *stack[T]) Items() []T {
+	res := make([]T, len(this.items))
+	copy(res, this.items)
+	return res
+}
+
 // ----------------------------------Set---------------------------------------
 type Set[T comparable] interface {
 	Add(item T) bool
 	Remove(item T) bool
-	Enumerate(func(item T))
 	Len() int
+	Items() []T
 }
 
 type set[T comparable] struct {
@@ -304,17 +302,26 @@ func (this *set[T]) Remove(item T) bool {
 	return false
 }
 
-func (this *set[T]) Enumerate(action func(item T)) {
-	for k := range this.items {
-		action(k)
-	}
-}
-
 func (this *set[T]) Len() int {
 	return len(this.items)
 }
 
+func (this *set[T]) Items() []T {
+	res := make([]T, 0, len(this.items))
+	for k := range this.items {
+		res = append(res, k)
+	}
+	return res
+}
+
 // ----------------------------------Math---------------------------------------
+func Min[T orderable](a, b T) T {
+	if a < b {
+		return a
+	}
+	return b
+}
+
 func Max[T orderable](a, b T) T {
 	if a > b {
 		return a
@@ -322,7 +329,14 @@ func Max[T orderable](a, b T) T {
 	return b
 }
 
-func Min[T orderable](a, b T) T {
+func Abs[T orderable](a T) T {
+	if a > 0 {
+		return a
+	}
+	return -a
+}
+
+func MinInt(a, b int) int {
 	if a < b {
 		return a
 	}
@@ -336,14 +350,7 @@ func MaxInt(a, b int) int {
 	return b
 }
 
-func MinInt(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func Abs[T orderable](a T) T {
+func AbsInt(a int) int {
 	if a > 0 {
 		return a
 	}
@@ -371,9 +378,9 @@ func QuickSelect[T orderable](arr []T, ind int) (res T) {
 
 func hoarePartition[T orderable](start, end int, arr []T) int {
 	/*
-	 * pl--------------------------r
-	 * p---<=p---l--------r--->=p---
-	 * ---<=p--------p-------->=p---
+	 * pl------------?-------------r
+	 * p---<=p---l---?---r--->=p----
+	 * ----<=p-------p------->=p----
 	 */
 
 	m := start + (end-start)/2
@@ -411,7 +418,7 @@ func hoarePartition[T orderable](start, end int, arr []T) int {
 
 func entropyOptimalPartition[T orderable](start, end int, arr []T) int {
 	/*
-	 * p(l,i)-----------------------------r
+	 * p(l,i)------------?----------------r
 	 * p---<p---l---=p---i---?---r--->p----
 	 * ----<p-----------=p----------->p----
 	 */
@@ -442,7 +449,6 @@ func entropyOptimalPartition[T orderable](start, end int, arr []T) int {
 	return r
 }
 
-// helper types
 type orderable interface {
 	~float32 | ~float64 |
 		~int | ~int8 |
