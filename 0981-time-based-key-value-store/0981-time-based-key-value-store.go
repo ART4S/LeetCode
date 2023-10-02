@@ -32,21 +32,17 @@ func (this *TimeMap) Get(key string, timestamp int) string {
 	l, r := 0, len(arr)-1
 
 	for l < r {
-		m := l + (r-l)/2
+		m := l + (r-l)/2 + 1
 
-		if arr[m].timestamp > timestamp {
-			r = m
+		if arr[m].timestamp <= timestamp {
+			l = m
 		} else {
-			l = m + 1
+			r = m - 1
 		}
 	}
 
-	if arr[l].timestamp <= timestamp {
-		return arr[l].value
-	}
-    
-	if l > 0 && arr[l-1].timestamp <= timestamp {
-		return arr[l-1].value
+	if arr[r].timestamp <= timestamp {
+		return arr[r].value
 	}
 
 	return ""
