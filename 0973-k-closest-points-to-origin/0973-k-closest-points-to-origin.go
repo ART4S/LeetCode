@@ -1,13 +1,16 @@
-func kClosest(points [][]int, k int) (result [][]int) {
+func kClosest(points [][]int, k int) (res [][]int) {
 	que := NewPriorityQueue[[]int]()
 
 	for _, p := range points {
-		que.Push(p, p[0]*p[0] + p[1]*p[1])
+		que.Push(p, -(p[0]*p[0] + p[1]*p[1]))
+		if que.Len() > k {
+			que.Pop()
+		}
 	}
 
-	for k > 0 {
-		k--
-		result = append(result, que.Pop())
+	for que.Len() > 0 {
+		p, _ := que.Pop()
+		res = append(res, p)
 	}
 
 	return
@@ -16,8 +19,8 @@ func kClosest(points [][]int, k int) (result [][]int) {
 // ----------------------------------Priority queue---------------------------------------
 type PriorityQueue[TKey any] interface {
 	Push(key TKey, priority int)
-	Peek() TKey
-	Pop() TKey
+	Peek() (TKey, int)
+	Pop() (TKey, int)
 	Len() int
 }
 
@@ -37,14 +40,14 @@ func NewPriorityQueue[TKey any]() PriorityQueue[TKey] {
 func (this *priorityQueue[TKey]) Push(key TKey, priority int) {
 	this.items = append(this.items, &item[TKey]{key, priority})
 
-	heapify_up(this, len(this.items)-1)
+	this.heapify_up(len(this.items) - 1)
 }
 
-func (this *priorityQueue[TKey]) Peek() TKey {
-	return this.items[0].key
+func (this *priorityQueue[TKey]) Peek() (TKey, int) {
+	return this.items[0].key, this.items[0].priority
 }
 
-func (this *priorityQueue[TKey]) Pop() TKey {
+func (this *priorityQueue[TKey]) Pop() (TKey, int) {
 	result := this.items[0]
 	this.items[0] = this.items[len(this.items)-1]
 	this.items = this.items[:len(this.items)-1]
@@ -53,14 +56,14 @@ func (this *priorityQueue[TKey]) Pop() TKey {
 		this.heapify_down(0)
 	}
 
-	return result.key
+	return result.key, result.priority
 }
 
 func (this *priorityQueue[TKey]) Len() int {
 	return len(this.items)
 }
 
-func heapify_up[TKey any](this *priorityQueue[TKey], i int) {
+func (this *priorityQueue[TKey]) heapify_up(i int) {
 	for i != 0 {
 		parent := (i - 1) / 2
 		if this.less(i, parent) {
@@ -151,38 +154,138 @@ func (this *disjointSet) Unite(x int, y int) {
 	}
 }
 
+// ----------------------------------Deque---------------------------------------
+type Deque[T any] interface {
+	PushFront(item T)
+	PushBack(item T)
+	PeekFront() T
+	PeekBack() T
+	PopFront() T
+	PopBack() T
+	Len() int
+	Items() []T
+}
+
+type deque[T any] struct {
+	headSentinel *LinkedListNode[T]
+	tailSentinel *LinkedListNode[T]
+	_len         int
+}
+
+func NewDeque[T any]() Deque[T] {
+	hs := &LinkedListNode[T]{}
+	ts := &LinkedListNode[T]{}
+
+	hs.next, ts.prev = ts, hs
+
+	return &deque[T]{hs, ts, 0}
+}
+
+func (this *deque[T]) PushFront(item T) {
+	node := &LinkedListNode[T]{value: item}
+	next := this.headSentinel.next
+
+	node.next = next
+	next.prev = node
+
+	this.headSentinel.next = node
+	node.prev = this.headSentinel
+
+	this._len++
+}
+
+func (this *deque[T]) PushBack(item T) {
+	node := &LinkedListNode[T]{value: item}
+	prev := this.tailSentinel.prev
+
+	prev.next = node
+	node.prev = prev
+
+	node.next = this.tailSentinel
+	this.tailSentinel.prev = node
+
+	this._len++
+}
+
+func (this *deque[T]) PeekFront() T {
+	return this.headSentinel.next.value
+}
+
+func (this *deque[T]) PeekBack() T {
+	return this.tailSentinel.prev.value
+}
+
+func (this *deque[T]) PopFront() T {
+	remove := this.headSentinel.next
+
+	remove.prev.next, remove.next.prev = remove.next, remove.prev
+	remove.prev, remove.next = nil, nil
+
+	this._len--
+
+	return remove.value
+}
+
+func (this *deque[T]) PopBack() T {
+	remove := this.tailSentinel.prev
+
+	remove.prev.next, remove.next.prev = remove.next, remove.prev
+	remove.prev, remove.next = nil, nil
+
+	this._len--
+
+	return remove.value
+}
+
+func (this *deque[T]) Len() int {
+	return this._len
+}
+
+func (this *deque[T]) Items() []T {
+	items := make([]T, this._len)
+
+	for cur := this.headSentinel.next; cur != this.tailSentinel; cur = cur.next {
+		items = append(items, cur.value)
+	}
+
+	return items
+}
+
 // ----------------------------------Queue---------------------------------------
 type Queue[T any] interface {
 	Push(item T)
 	Peek() T
 	Pop() T
 	Len() int
+	Items() []T
 }
 
 type queue[T any] struct {
-	items []T
+	dq Deque[T]
 }
 
 func NewQueue[T any]() Queue[T] {
-	return &queue[T]{make([]T, 0)}
+	return &queue[T]{NewDeque[T]()}
 }
 
 func (this *queue[T]) Push(item T) {
-	this.items = append(this.items, item)
+	this.dq.PushBack(item)
 }
 
 func (this *queue[T]) Peek() T {
-	return this.items[0]
+	return this.dq.PeekFront()
 }
 
 func (this *queue[T]) Pop() T {
-	result := this.items[0]
-	this.items = this.items[1:]
-	return result
+	return this.dq.PopFront()
 }
 
 func (this *queue[T]) Len() int {
-	return len(this.items)
+	return this.dq.Len()
+}
+
+func (this *queue[T]) Items() []T {
+	return this.dq.Items()
 }
 
 // ----------------------------------Stack---------------------------------------
@@ -191,6 +294,7 @@ type Stack[T any] interface {
 	Peek() T
 	Pop() T
 	Len() int
+	Items() []T
 }
 
 type stack[T any] struct {
@@ -219,12 +323,18 @@ func (this *stack[T]) Len() int {
 	return len(this.items)
 }
 
+func (this *stack[T]) Items() []T {
+	res := make([]T, len(this.items))
+	copy(res, this.items)
+	return res
+}
+
 // ----------------------------------Set---------------------------------------
 type Set[T comparable] interface {
 	Add(item T) bool
 	Remove(item T) bool
-	Enumerate(func(item T))
 	Len() int
+	Items() []T
 }
 
 type set[T comparable] struct {
@@ -258,39 +368,192 @@ func (this *set[T]) Remove(item T) bool {
 	return false
 }
 
-func (this *set[T]) Enumerate(action func(item T)) {
-	for k := range this.items {
-		action(k)
-	}
-}
-
 func (this *set[T]) Len() int {
 	return len(this.items)
 }
 
+func (this *set[T]) Items() []T {
+	res := make([]T, 0, len(this.items))
+	for k := range this.items {
+		res = append(res, k)
+	}
+	return res
+}
+
+// ----------------------------------Linked List---------------------------------------
+type LinkedListNode[T any] struct {
+	value T
+	prev  *LinkedListNode[T]
+	next  *LinkedListNode[T]
+}
+
+func (this *LinkedListNode[T]) AddBefore(node *LinkedListNode[T]) {
+	if node.prev != nil {
+		node.prev.next = this
+	}
+
+	this.next = node
+	node.prev = this
+}
+
+func (this *LinkedListNode[T]) AddAfter(node *LinkedListNode[T]) {
+	if node.next != nil {
+		node.next.prev = this
+	}
+
+	this.prev = node
+	node.next = this
+}
+
+func (this *LinkedListNode[T]) Remove() {
+	if this.prev != nil {
+		this.prev.next = this.next
+	}
+
+	if this.next != nil {
+		this.next.prev = this.prev
+	}
+
+	this.prev = nil
+	this.next = nil
+}
+
 // ----------------------------------Math---------------------------------------
-func min[T Orderable](a, b T) T {
+func Min[T orderable](a, b T) T {
 	if a < b {
 		return a
 	}
 	return b
 }
 
-func max[T Orderable](a, b T) T {
+func Max[T orderable](a, b T) T {
 	if a > b {
 		return a
 	}
 	return b
 }
 
-func abs[T Orderable](a T) T {
+func Abs[T orderable](a T) T {
 	if a > 0 {
 		return a
 	}
 	return -a
 }
 
-type Orderable interface {
+func MinInt(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func MaxInt(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func AbsInt(a int) int {
+	if a > 0 {
+		return a
+	}
+	return -a
+}
+
+// ----------------------------------Quick Select Algorithm---------------------------------------
+// https://algs4.cs.princeton.edu/23quicksort/
+func QuickSelect[T orderable](arr []T, ind int) (res T) {
+	l, r := 0, len(arr)-1
+
+	for {
+		pivot := hoarePartition(l, r, arr)
+
+		switch {
+		case pivot == ind:
+			return arr[ind]
+		case pivot < ind:
+			l = pivot + 1
+		default:
+			r = pivot - 1
+		}
+	}
+}
+
+func hoarePartition[T orderable](start, end int, arr []T) int {
+	/*
+	 * pl------------?-------------r
+	 * p---<=p---l---?---r--->=p----
+	 * ----<=p-------p------->=p----
+	 */
+
+	m := start + (end-start)/2
+	arr[m], arr[start] = arr[start], arr[m]
+	pivot := arr[start]
+
+	l, r := start, end+1
+
+	for {
+		for l < end {
+			l++
+			if arr[l] >= pivot {
+				break
+			}
+		}
+
+		for {
+			r--
+			if arr[r] <= pivot {
+				break
+			}
+		}
+
+		if l >= r {
+			break
+		}
+
+		arr[l], arr[r] = arr[r], arr[l]
+	}
+
+	arr[start], arr[r] = arr[r], arr[start]
+
+	return r
+}
+
+func entropyOptimalPartition[T orderable](start, end int, arr []T) int {
+	/*
+	 * p(l,i)------------?----------------r
+	 * p---<p---l---=p---i---?---r--->p----
+	 * ----<p-----------=p----------->p----
+	 */
+
+	m := start + (end-start)/2
+	arr[m], arr[start] = arr[start], arr[m]
+	pivot := arr[start]
+
+	l, r := start+1, end
+	i := l
+
+	for i <= r {
+		switch c := arr[i] - pivot; {
+		case c < 0:
+			arr[l], arr[i] = arr[i], arr[l]
+			i++
+			l++
+		case c > 0:
+			arr[r], arr[i] = arr[i], arr[l]
+			r--
+		default:
+			i++
+		}
+	}
+
+	arr[start], arr[r] = arr[r], arr[start]
+
+	return r
+}
+
+type orderable interface {
 	~float32 | ~float64 |
 		~int | ~int8 |
 		~int16 | ~int32 |
