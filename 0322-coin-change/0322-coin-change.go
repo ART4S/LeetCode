@@ -3,22 +3,24 @@ func coinChange(coins []int, amount int) int {
 		return 0
 	}
 
+	const empty = 10001
+
 	dp := make([]int, amount+1)
 	for i := range dp {
-		dp[i] = math.MaxInt
+		dp[i] = empty
 	}
 
 	for _, c := range coins {
 		for i := c; i <= amount; i++ {
 			if i == c {
 				dp[i] = 1
-			} else if i-c >= 0 && dp[i-c] != math.MaxInt {
+			} else if i-c >= 0 && dp[i-c] != empty {
 				dp[i] = MinInt(dp[i], 1+dp[i-c])
 			}
 		}
 	}
 
-	if dp[amount] == math.MaxInt {
+	if dp[amount] == empty {
 		return -1
 	}
 
