@@ -1,7 +1,7 @@
 func checkValidString(s string) bool {
 	stack := NewStack[byte]()
 
-	memo := make([]map[string]int, len(s)+1)
+	memo := make([]map[string]int, len(s))
 
 	for i := range memo {
 		memo[i] = make(map[string]int)
