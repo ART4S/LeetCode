@@ -30,13 +30,7 @@ func canPartition(nums []int) bool {
 		}
 	}
 
-	for i := range dp {
-		if dp[i][targetSum] {
-			return true
-		}
-	}
-
-	return false
+	return dp[n-1][m-1]
 }
 
 // ----------------------------------Priority queue---------------------------------------
