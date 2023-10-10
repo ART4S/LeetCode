@@ -1,72 +1,50 @@
 func checkValidString(s string) bool {
-	stack := NewStack[byte]()
-
-	memo := make([]map[string]int, len(s))
+	memo := make([][]int, len(s))
 
 	for i := range memo {
-		memo[i] = make(map[string]int)
+		memo[i] = make([]int, len(s))
 	}
 
-	var solve func(int) int
+	var solve func(int, int) int
 
-	open := func(i int) int {
-		stack.Push('(')
-		if solve(i+1) == 1 {
-			return 1
+	solve = func(i int, open int) int {
+		if open < 0 {
+			return -1
 		}
-		stack.Pop()
-		return -1
-	}
 
-	close := func(i int) int {
-		if stack.Len() > 0 {
-			p := stack.Pop()
-			if solve(i+1) == 1 {
-				return 1
-			}
-			stack.Push(p)
-		}
-		return -1
-	}
-
-	solve = func(i int) int {
 		if i == len(s) {
-			if stack.Len() == 0 {
+			if open == 0 {
 				return 1
 			} else {
 				return -1
 			}
 		}
 
-		par := string(stack.Items())
-
-		if memo[i][par] == 0 {
+		if memo[i][open] == 0 {
 			switch s[i] {
 			case '(':
-				memo[i][par] = open(i)
+				memo[i][open] = solve(i+1, open+1)
 			case ')':
-				memo[i][par] = close(i)
+				memo[i][open] = solve(i+1, open-1)
 			default:
-				o := open(i)
-				if o == 1 {
-					memo[i][par] = o
+				memo[i][open] = solve(i+1, open+1)
+				if memo[i][open] == 1 {
 					break
 				}
-				
-				c := close(i)
-				if c == 1 {
-					memo[i][par] = c
+
+				memo[i][open] = solve(i+1, open-1)
+				if memo[i][open] == 1 {
 					break
 				}
-				
-				memo[i][par] = solve(i + 1)
+
+				memo[i][open] = solve(i+1, open)
 			}
 		}
 
-		return memo[i][par]
+		return memo[i][open]
 	}
 
-	return solve(0) == 1
+	return solve(0, 0) == 1
 }
 
 // ----------------------------------Priority queue---------------------------------------
