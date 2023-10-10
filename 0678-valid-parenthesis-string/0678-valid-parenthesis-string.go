@@ -1,50 +1,29 @@
 func checkValidString(s string) bool {
-	memo := make([][]int, len(s))
-
-	for i := range memo {
-		memo[i] = make([]int, len(s))
+	dp := make([][]bool, len(s)+1)
+	for i := range dp {
+		dp[i] = make([]bool, len(s)+2)
 	}
 
-	var solve func(int, int) int
+	dp[0][1] = true
 
-	solve = func(i int, open int) int {
-		if open < 0 {
-			return -1
-		}
-
-		if i == len(s) {
-			if open == 0 {
-				return 1
-			} else {
-				return -1
+	for i := 0; i < len(s); i++ {
+		for open := 1; open <= len(s); open++ {
+			if dp[i][open] {
+				switch s[i] {
+				case '(':
+					dp[i+1][open+1] = true
+				case ')':
+					dp[i+1][open-1] = true
+				case '*':
+					dp[i+1][open] = true
+					dp[i+1][open+1] = true
+					dp[i+1][open-1] = true
+				}
 			}
 		}
-
-		if memo[i][open] == 0 {
-			switch s[i] {
-			case '(':
-				memo[i][open] = solve(i+1, open+1)
-			case ')':
-				memo[i][open] = solve(i+1, open-1)
-			default:
-				memo[i][open] = solve(i+1, open+1)
-				if memo[i][open] == 1 {
-					break
-				}
-
-				memo[i][open] = solve(i+1, open-1)
-				if memo[i][open] == 1 {
-					break
-				}
-
-				memo[i][open] = solve(i+1, open)
-			}
-		}
-
-		return memo[i][open]
 	}
 
-	return solve(0, 0) == 1
+	return dp[len(dp)-1][1]
 }
 
 // ----------------------------------Priority queue---------------------------------------
