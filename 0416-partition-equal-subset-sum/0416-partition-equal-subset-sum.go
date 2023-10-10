@@ -1,8 +1,10 @@
 func canPartition(nums []int) bool {
 	sum := 0
+
 	for _, n := range nums {
 		sum += n
 	}
+
 	if sum%2 != 0 {
 		return false
 	}
@@ -13,7 +15,6 @@ func canPartition(nums []int) bool {
 	m := targetSum + 1
 
 	dp := make([][]bool, n)
-
 	for i := range dp {
 		dp[i] = make([]bool, m)
 		dp[i][0] = true
