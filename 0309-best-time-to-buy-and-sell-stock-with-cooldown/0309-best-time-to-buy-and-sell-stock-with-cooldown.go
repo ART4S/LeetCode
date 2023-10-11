@@ -15,7 +15,7 @@ func maxProfit(prices []int) int {
 		dp[i][wait] = dp[i-1][sell]
 	}
 
-	return MaxInt(dp[len(dp)-1][sell], 0)
+	return dp[len(dp)-1][sell]
 }
 
 // ----------------------------------Priority queue---------------------------------------
