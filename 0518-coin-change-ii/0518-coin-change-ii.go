@@ -4,10 +4,8 @@ func change(amount int, coins []int) int {
 	dp[0] = 1
 
 	for _, c := range coins {
-		for a := 0; a <= amount; a++ {
-			if a >= c {
-				dp[a] += dp[a-c]
-			}
+		for a := c; a <= amount; a++ {
+			dp[a] += dp[a-c]
 		}
 	}
 
