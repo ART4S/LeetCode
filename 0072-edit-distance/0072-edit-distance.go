@@ -15,16 +15,15 @@ func minDistance(word1 string, word2 string) int {
 
 	for i := 1; i <= len(word1); i++ {
 		for j := 1; j <= len(word2); j++ {
-			var rep int
 			if word1[i-1] == word2[j-1] {
-				rep = dp[i-1][j-1]
+				dp[i][j] = dp[i-1][j-1]
 			} else {
-				rep = dp[i-1][j-1] + 1
-			}
-			ins := dp[i][j-1] + 1
-			del := dp[i-1][j] + 1
+				rep := dp[i-1][j-1] + 1
+				ins := dp[i][j-1] + 1
+				del := dp[i-1][j] + 1
 
-			dp[i][j] = MinInt(rep, MinInt(ins, del))
+				dp[i][j] = MinInt(rep, MinInt(ins, del))
+			}
 		}
 	}
 
