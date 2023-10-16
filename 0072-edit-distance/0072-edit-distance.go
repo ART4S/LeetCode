@@ -18,16 +18,53 @@ func minDistance(word1 string, word2 string) int {
 			if word1[i-1] == word2[j-1] {
 				dp[i][j] = dp[i-1][j-1]
 			} else {
-				rep := dp[i-1][j-1] + 1
-				ins := dp[i][j-1] + 1
-				del := dp[i-1][j] + 1
+				rep := dp[i-1][j-1]
+				ins := dp[i][j-1]
+				del := dp[i-1][j]
 
-				dp[i][j] = MinInt(rep, MinInt(ins, del))
+				dp[i][j] = 1 + MinInt(rep, MinInt(ins, del))
 			}
 		}
 	}
 
 	return dp[len(word1)][len(word2)]
+}
+
+func minDistance_memo(word1 string, word2 string) int {
+	memo := make([][]int, len(word1)+1)
+
+	for i := range memo {
+		memo[i] = make([]int, len(word2)+1)
+		for j := range memo[i] {
+			memo[i][j] = -1
+		}
+	}
+
+	var solve func(int, int) int
+
+	solve = func(i, j int) int {
+		if memo[i][j] == -1 {
+			if i == len(word1) {
+				memo[i][j] = len(word2) - j
+			} else if j == len(word2) {
+				memo[i][j] = len(word1) - i
+			} else {
+				if word1[i] == word2[j] {
+					return solve(i+1, j+1)
+				}
+
+				replace := solve(i+1, j+1)
+				insert := solve(i, j+1)
+				delete := solve(i+1, j)
+
+				memo[i][j] = 1 + MinInt(insert, MinInt(delete, replace))
+			}
+		}
+
+		return memo[i][j]
+	}
+
+	return solve(0, 0)
 }
 
 // ----------------------------------Priority queue---------------------------------------
