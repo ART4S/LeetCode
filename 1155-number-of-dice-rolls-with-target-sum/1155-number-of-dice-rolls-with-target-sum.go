@@ -40,14 +40,14 @@ func numRollsToTarget_memo(n int, k int, target int) int {
 			return 1
 		}
 
-		if i == 0 || sum <= 0 {
+		if i == 0 || sum == 0 {
 			return 0
 		}
 
 		if memo[i][sum] == -1 {
 			res := 0
 
-			for roll := 1; roll <= k; roll++ {
+			for roll := 1; roll <= Min(sum, roll); roll++ {
 				res = (res + solve(i-1, sum-roll)) % mod
 			}
 
