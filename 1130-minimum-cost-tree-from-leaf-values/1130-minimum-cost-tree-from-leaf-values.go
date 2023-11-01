@@ -23,7 +23,7 @@ func mctFromLeafValues(arr []int) int {
 		for l := r - 1; l >= 0; l-- {
 			dp[l][r] = math.MaxInt
 			for m := l; m < r; m++ {
-				dp[l][r] = Min(dp[l][r], dp[l][m]+dp[m+1][r]+mx[m+1][r]*mx[l][m])
+				dp[l][r] = Min(dp[l][r], dp[l][m]+dp[m+1][r]+mx[l][m]*mx[m+1][r])
 			}
 		}
 	}
