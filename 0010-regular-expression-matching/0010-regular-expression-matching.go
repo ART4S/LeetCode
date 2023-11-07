@@ -21,11 +21,9 @@ func isMatch(s string, p string) bool {
 
 			if i == len(s) || j == len(p) {
 				if i == len(s) && j+1 < len(p) && p[j+1] == '*' {
-					if j+1 < len(p) && p[j+1] == '*' {
-						if solve(i, j+2) {
-							memo[i][j] = 1
-						}
-					}
+                    if solve(i, j+2) {
+                        memo[i][j] = 1
+                    }
 				}
 			} else if j+1 < len(p) && p[j+1] == '*' {
 				if p[j] == '.' || p[j] == s[i] {
@@ -58,9 +56,7 @@ func isMatch1(s string, p string) bool {
 
 		if i == len(s) || j == len(p) {
 			if i == len(s) && j+1 < len(p) && p[j+1] == '*' {
-				if j+1 < len(p) && p[j+1] == '*' {
-					return solve(i, j+2)
-				}
+	            return solve(i, j+2)
 			}
 
 			return false
