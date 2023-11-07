@@ -1,72 +1,55 @@
 func minCostConnectPoints(points [][]int) int {
 	type edge struct {
-		start  int
-		finish int
-		cost   int
-	}
-
-	edges := make(map[int][]edge)
-
-	for i := range points {
-		edges[i] = make([]edge, 0)
+		pointTo int
+		cost    int
 	}
 
 	n := len(points)
 
+	adjList := make([][]edge, n)
+
+	for i := range adjList {
+		adjList[i] = make([]edge, 0)
+	}
+
 	for i := 0; i < n-1; i++ {
 		for j := i + 1; j < n; j++ {
-			e := edge{
-				start:  i,
-				finish: j,
-				cost:   Abs(points[i][0]-points[j][0]) + Abs(points[i][1]-points[j][1]),
-			}
+			cost := Abs(points[i][0]-points[j][0]) + Abs(points[i][1]-points[j][1])
 
-			edges[i] = append(edges[i], e)
-			edges[j] = append(edges[j], e)
+			adjList[i] = append(adjList[i], edge{j, cost})
+			adjList[j] = append(adjList[j], edge{i, cost})
 		}
 	}
 
 	visited := make(map[int]struct{})
 
-	visited[0] = struct{}{}
-
 	que := NewPriorityQueue[edge]()
 
-	for _, e := range edges[0] {
-		que.Push(e, e.cost)
-	}
+	que.Push(edge{0, 0}, 0)
 
 	minCost := 0
 
 	for len(visited) != n {
 		e, _ := que.Pop()
 
-		np := 0
-
-		if _, ok := visited[e.start]; !ok {
-			np = e.start
-		} else {
-			np = e.finish
+		if _, ok := visited[e.pointTo]; ok {
+			continue
 		}
 
-		if _, ok := visited[np]; !ok {
-			minCost += e.cost
+		visited[e.pointTo] = struct{}{}
 
-			visited[np] = struct{}{}
+		minCost += e.cost
 
-			for _, ne := range edges[np] {
-				_, vs := visited[ne.start]
-				_, vf := visited[ne.finish]
-
-				if !vs || !vf {
-					que.Push(ne, ne.cost)
-				}
+		for _, ne := range adjList[e.pointTo] {
+			if _, ok := visited[ne.pointTo]; !ok {
+				que.Push(ne, ne.cost)
 			}
 		}
 	}
 
 	return minCost
 }
+
 
 // ----------------------------------Priority queue---------------------------------------
 type PriorityQueue[TKey any] interface {
