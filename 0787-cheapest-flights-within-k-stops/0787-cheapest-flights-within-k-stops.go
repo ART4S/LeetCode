@@ -22,7 +22,7 @@ func findCheapestPrice(n int, flights [][]int, src int, dst int, k int) int {
 		cost = nextcost
 	}
 
-	if cost[dst] >= mx {
+	if cost[dst] == mx {
 		return -1
 	}
 
