@@ -1,4 +1,35 @@
+// Optimized dp
 func findCheapestPrice(n int, flights [][]int, src int, dst int, k int) int {
+	const mx = 1e9
+
+	cost := make([]int, n)
+
+	for i := range cost {
+		cost[i] = mx
+	}
+
+	cost[src] = 0
+
+	for step := 0; step <= k; step++ {
+		nextcost := make([]int, n)
+
+		copy(nextcost, cost)
+
+		for _, f := range flights {
+			nextcost[f[1]] = Min(nextcost[f[1]], cost[f[0]]+f[2])
+		}
+
+		cost = nextcost
+	}
+
+	if cost[dst] >= mx {
+		return -1
+	}
+
+	return cost[dst]
+}
+
+func findCheapestPrice_dp(n int, flights [][]int, src int, dst int, k int) int {
 	k++
 
 	type edge struct {
@@ -105,59 +136,6 @@ func findCheapestPrice_queue(n int, flights [][]int, src int, dst int, k int) in
 
 	for step := 0; step <= k; step++ {
 		res = Min(res, cost[dst][step])
-	}
-
-	if res == math.MaxInt {
-		return -1
-	}
-
-	return res
-}
-
-func findCheapestPrice_dp(n int, flights [][]int, src int, dst int, k int) int {
-	k++
-
-	type edge struct {
-		pointTo int
-		price   int
-	}
-
-	adjList := make([][]edge, n+1)
-
-	for i := 1; i <= n; i++ {
-		adjList[n] = make([]edge, 0)
-	}
-
-	for _, f := range flights {
-		adjList[f[0]] = append(adjList[f[0]], edge{f[1], f[2]})
-	}
-
-	dp := make([][]int, n)
-
-	for point := range dp {
-		dp[point] = make([]int, k+1)
-
-		for step := range dp[point] {
-			dp[point][step] = math.MaxInt
-		}
-	}
-
-	dp[src][0] = 0
-
-	for step := 1; step <= k; step++ {
-		for point := 0; point < n; point++ {
-			if dp[point][step-1] != math.MaxInt {
-				for _, e := range adjList[point] {
-					dp[e.pointTo][step] = Min(dp[e.pointTo][step], dp[point][step-1]+e.price)
-				}
-			}
-		}
-	}
-
-	res := math.MaxInt
-
-	for step := 0; step <= k; step++ {
-		res = Min(res, dp[dst][step])
 	}
 
 	if res == math.MaxInt {
