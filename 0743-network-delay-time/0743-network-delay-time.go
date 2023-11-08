@@ -1,4 +1,64 @@
 func networkDelayTime(times [][]int, n int, k int) int {
+	type edge struct {
+		pointTo int
+		time    int
+	}
+
+	adjList := make([][]edge, n+1)
+
+	for i := 1; i <= n; i++ {
+		adjList[n] = make([]edge, 0)
+	}
+
+	for _, t := range times {
+		adjList[t[0]] = append(adjList[t[0]], edge{t[1], t[2]})
+	}
+
+	travelCost := make([]int, n+1)
+
+	for i := 1; i <= n; i++ {
+		travelCost[i] = math.MaxInt
+	}
+
+	travelCost[k] = 0
+
+	visited := make(map[int]struct{})
+
+	pq := NewPriorityQueue[int]()
+
+	pq.Push(k, 0)
+
+	for pq.Len() > 0 {
+		point, _ := pq.Pop()
+
+		if _, ok := visited[point]; ok {
+			continue
+		}
+
+		visited[point] = struct{}{}
+
+		for _, edge := range adjList[point] {
+			if _, ok := visited[edge.pointTo]; !ok {
+				travelCost[edge.pointTo] = Min(travelCost[edge.pointTo], travelCost[point]+edge.time)
+				pq.Push(edge.pointTo, travelCost[edge.pointTo])
+			}
+		}
+	}
+
+	res := 0
+
+	for i := 1; i <= n; i++ {
+		if travelCost[i] == math.MaxInt {
+			return -1
+		}
+
+		res = Max(res, travelCost[i])
+	}
+
+	return res
+}
+
+func networkDelayTime_floydWarshall(times [][]int, n int, k int) int {
 	dp := make([][]int, n+1)
 
 	for i := range dp {
@@ -37,6 +97,7 @@ func networkDelayTime(times [][]int, n int, k int) int {
 
 	return res
 }
+
 
 // ----------------------------------Priority queue---------------------------------------
 type PriorityQueue[TKey any] interface {
