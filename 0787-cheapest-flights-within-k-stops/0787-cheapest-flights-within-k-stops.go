@@ -51,6 +51,122 @@ func findCheapestPrice(n int, flights [][]int, src int, dst int, k int) int {
 	return res
 }
 
+func findCheapestPrice_queue(n int, flights [][]int, src int, dst int, k int) int {
+	k++
+
+	type edge struct {
+		pointTo int
+		price   int
+	}
+
+	adjList := make([][]edge, n+1)
+
+	for i := 0; i < n; i++ {
+		adjList[n] = make([]edge, 0)
+	}
+
+	for _, f := range flights {
+		adjList[f[0]] = append(adjList[f[0]], edge{f[1], f[2]})
+	}
+
+	cost := make([][]int, n)
+
+	for point := range cost {
+		cost[point] = make([]int, k+1)
+
+		for step := range cost[point] {
+			cost[point][step] = math.MaxInt
+		}
+	}
+
+	cost[src][0] = 0
+
+	que := NewQueue[int]()
+
+	que.Push(src)
+
+	for step := 1; step <= k; step++ {
+		qlen := que.Len()
+
+		for qlen > 0 {
+			qlen--
+			pointFrom := que.Pop()
+			for _, e := range adjList[pointFrom] {
+				nc := cost[pointFrom][step-1] + e.price
+				if nc < cost[e.pointTo][step] {
+					cost[e.pointTo][step] = nc
+					que.Push(e.pointTo)
+				}
+			}
+		}
+	}
+
+	res := math.MaxInt
+
+	for step := 0; step <= k; step++ {
+		res = Min(res, cost[dst][step])
+	}
+
+	if res == math.MaxInt {
+		return -1
+	}
+
+	return res
+}
+
+func findCheapestPrice_dp(n int, flights [][]int, src int, dst int, k int) int {
+	k++
+
+	type edge struct {
+		pointTo int
+		price   int
+	}
+
+	adjList := make([][]edge, n+1)
+
+	for i := 1; i <= n; i++ {
+		adjList[n] = make([]edge, 0)
+	}
+
+	for _, f := range flights {
+		adjList[f[0]] = append(adjList[f[0]], edge{f[1], f[2]})
+	}
+
+	dp := make([][]int, n)
+
+	for point := range dp {
+		dp[point] = make([]int, k+1)
+
+		for step := range dp[point] {
+			dp[point][step] = math.MaxInt
+		}
+	}
+
+	dp[src][0] = 0
+
+	for step := 1; step <= k; step++ {
+		for point := 0; point < n; point++ {
+			if dp[point][step-1] != math.MaxInt {
+				for _, e := range adjList[point] {
+					dp[e.pointTo][step] = Min(dp[e.pointTo][step], dp[point][step-1]+e.price)
+				}
+			}
+		}
+	}
+
+	res := math.MaxInt
+
+	for step := 0; step <= k; step++ {
+		res = Min(res, dp[dst][step])
+	}
+
+	if res == math.MaxInt {
+		return -1
+	}
+
+	return res
+}
+
 // ----------------------------------Priority queue---------------------------------------
 type PriorityQueue[TKey any] interface {
 	Push(key TKey, priority int)
