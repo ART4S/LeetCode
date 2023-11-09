@@ -27,12 +27,12 @@ func canPartitionKSubsets(nums []int, k int) bool {
 		}
 	}
 
-	solve = func(mask, sum, subsetCount int) bool {
+	solve = func(mask, subsetCount, sum int) bool {
 		if mask == allmask {
 			return subsetCount == k
 		}
 
-		if subsetCount >= k {
+		if subsetCount == k {
 			return false
 		}
 
@@ -42,13 +42,14 @@ func canPartitionKSubsets(nums []int, k int) bool {
 			for i := 0; i < n; i++ {
 				if mask&(1<<i) == 0 {
 					nextsum := sum + nums[i]
+
 					if nextsum < targetSum {
-						if solve(mask|(1<<i), nextsum, subsetCount) {
+						if solve(mask|(1<<i), subsetCount, nextsum) {
 							memo[mask][subsetCount] = 1
 							break
 						}
 					} else if nextsum == targetSum {
-						if solve(mask|(1<<i), 0, subsetCount+1) {
+						if solve(mask|(1<<i), subsetCount+1, 0) {
 							memo[mask][subsetCount] = 1
 							break
 						}
