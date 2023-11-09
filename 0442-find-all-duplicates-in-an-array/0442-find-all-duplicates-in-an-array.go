@@ -1,6 +1,6 @@
 func findDuplicates(nums []int) []int {
 	for i := range nums {
-		for nums[i]-1 != i && nums[i] != nums[nums[i]-1] {
+		for nums[i] != nums[nums[i]-1] {
 			temp := nums[nums[i]-1]
 			nums[nums[i]-1] = nums[i]
 			nums[i] = temp
