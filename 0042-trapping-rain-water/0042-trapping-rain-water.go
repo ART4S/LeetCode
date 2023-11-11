@@ -1,23 +1,24 @@
 func trap(height []int) int {
-	de := NewDeque[int]()
+	stack := NewStack[int]()
 
 	res := 0
 
-	for i := range height {
-		for de.Len() > 0 && height[i] > height[de.PeekBack()] {
-			back := de.PopBack()
+	for right := range height {
+		for stack.Len() > 0 && height[right] > height[stack.Peek()] {
+			middle := stack.Pop()
 
-			if de.Len() == 0 {
+			if stack.Len() == 0 {
 				break
 			}
 
-			threshold := Min(height[de.PeekBack()], height[i])
-			h := threshold - height[back]
-			w := i - de.PeekBack() - 1
+			left := stack.Peek()
+			waterline := Min(height[left], height[right])
+			h := waterline - height[middle]
+			w := right - left - 1
 			res += w * h
 		}
 
-		de.PushBack(i)
+		stack.Push(right)
 	}
 
 	return res
