@@ -4,16 +4,17 @@ func trap(height []int) int {
 	res := 0
 
 	for i := range height {
-		for de.Len() > 1 && height[de.PeekBack()] <= height[i] {
+		for de.Len() > 0 && height[i] > height[de.PeekBack()] {
 			back := de.PopBack()
+
+			if de.Len() == 0 {
+				break
+			}
+
 			threshold := Min(height[de.PeekBack()], height[i])
 			h := threshold - height[back]
 			w := i - de.PeekBack() - 1
 			res += w * h
-		}
-
-		for de.Len() > 0 && height[de.PeekBack()] <= height[i] {
-			de.PopBack()
 		}
 
 		de.PushBack(i)
