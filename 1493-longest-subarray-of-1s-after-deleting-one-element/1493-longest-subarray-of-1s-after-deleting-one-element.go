@@ -1,46 +1,28 @@
 func longestSubarray(nums []int) int {
 	prev_prev_count := 0
-
-	prev_num := 0
 	prev_count := 0
-
-	cur_num := 0
 	cur_count := 0
-
 	maxLen := 0
 
-	found_zero := false
-
 	for i := 0; i < len(nums); i++ {
-		if nums[i] != cur_num {
+		if i > 0 && nums[i] != nums[i - 1] {
 			prev_prev_count = prev_count
-
-			prev_num = cur_num
 			prev_count = cur_count
-
-			if cur_num == 0 {
-				cur_num = 1
-			} else {
-				cur_num = 0
-			}
-
 			cur_count = 0
 		}
 
 		cur_count++
 
-		if cur_num == 1 {
-			if prev_num == 0 && prev_count == 1 {
+		if nums[i] == 1 {
+			if prev_count == 1 {
 				maxLen = Max(maxLen, prev_prev_count+cur_count)
 			} else {
 				maxLen = Max(maxLen, cur_count)
 			}
-		} else {
-			found_zero = true
 		}
 	}
 
-	if !found_zero {
+	if nums[len(nums)-1] == 1 && prev_count == 0 {
 		return maxLen - 1
 	}
 
