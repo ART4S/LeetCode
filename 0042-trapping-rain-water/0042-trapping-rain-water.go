@@ -1,4 +1,58 @@
 func trap(height []int) int {
+	return trap_stack(height)
+}
+
+func trap_brute_force(height []int) int {
+	n := len(height)
+
+	res := 0
+
+	for i := 1; i < n-1; i++ {
+		lmax := 0
+
+		for l := 0; l < i; l++ {
+			lmax = Max(lmax, height[l])
+		}
+
+		rmax := 0
+
+		for r := i + 1; r < n; r++ {
+			rmax = Max(rmax, height[r])
+		}
+
+		res += Max(0, Min(lmax, rmax)-height[i])
+	}
+
+	return res
+}
+
+func trap_dp(height []int) int {
+	n := len(height)
+
+	lmax := make([]int, n)
+	rmax := make([]int, n)
+
+	lm := 0
+	rm := 0
+
+	for i := range height {
+		lmax[i] = lm
+		rmax[n-i-1] = rm
+
+		lm = Max(lm, height[i])
+		rm = Max(rm, height[n-i-1])
+	}
+
+	res := 0
+
+	for i := 1; i < n-1; i++ {
+		res += Max(0, Min(lmax[i], rmax[i])-height[i])
+	}
+
+	return res
+}
+
+func trap_stack(height []int) int {
 	stack := NewStack[int]()
 
 	res := 0
