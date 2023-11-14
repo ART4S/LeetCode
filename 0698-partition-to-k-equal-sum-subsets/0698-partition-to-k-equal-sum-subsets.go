@@ -1,4 +1,8 @@
 func canPartitionKSubsets(nums []int, k int) bool {
+	return canPartitionKSubsets_dp(nums, k)
+}
+
+func canPartitionKSubsets_dp(nums []int, k int) bool {
 	totalSum := 0
 
 	for _, n := range nums {
@@ -13,44 +17,75 @@ func canPartitionKSubsets(nums []int, k int) bool {
 
 	n := len(nums)
 
-	allmask := int(^(^0 << n))
+	allmask := 1 << n
 
-	var solve func(int, int, int) bool
+	dp := make([]int, allmask)
 
-	memo := make([][]int, allmask+1)
+	for i := range dp {
+		dp[i] = -1
+	}
 
-	for i := range memo {
-		memo[i] = make([]int, k+1)
+	dp[0] = 0
 
-		for j := range memo[i] {
-			memo[i][j] = -1
+	for i := 0; i < allmask; i++ {
+		if dp[i] == -1 {
+			continue
+		}
+
+		for j := 0; j < n; j++ {
+			if i&(1<<j) == 0 {
+				nexti := i | (1 << j)
+				nextsum := dp[i] + nums[j]
+				if nextsum <= targetSum {
+					dp[nexti] = nextsum % targetSum
+				}
+			}
 		}
 	}
 
-	solve = func(mask, subsetCount, sum int) bool {
-		if mask == allmask {
-			return subsetCount == k
+	return dp[allmask-1] != -1
+}
+
+func canPartitionKSubsets_memo(nums []int, k int) bool {
+	totalSum := 0
+
+	for _, n := range nums {
+		totalSum += n
+	}
+
+	if totalSum%k != 0 {
+		return false
+	}
+
+	targetSum := totalSum / k
+
+	n := len(nums)
+
+	allmask := 1 << n
+
+	var solve func(int, int) bool
+
+	memo := make([]int, allmask)
+
+	for i := range memo {
+		memo[i] = -1
+	}
+
+	solve = func(mask, sum int) bool {
+		if mask == allmask-1 {
+			return true
 		}
 
-		if subsetCount == k {
-			return false
-		}
-
-		if memo[mask][subsetCount] == -1 {
-			memo[mask][subsetCount] = 0
+		if memo[mask] == -1 {
+			memo[mask] = 0
 
 			for i := 0; i < n; i++ {
 				if mask&(1<<i) == 0 {
+					nexti := mask | (1 << i)
 					nextsum := sum + nums[i]
-
-					if nextsum < targetSum {
-						if solve(mask|(1<<i), subsetCount, nextsum) {
-							memo[mask][subsetCount] = 1
-							break
-						}
-					} else if nextsum == targetSum {
-						if solve(mask|(1<<i), subsetCount+1, 0) {
-							memo[mask][subsetCount] = 1
+					if nextsum <= targetSum {
+						if solve(nexti, nextsum%targetSum) {
+							memo[mask] = 1
 							break
 						}
 					}
@@ -58,10 +93,10 @@ func canPartitionKSubsets(nums []int, k int) bool {
 			}
 		}
 
-		return memo[mask][subsetCount] == 1
+		return memo[mask] == 1
 	}
 
-	return solve(0, 0, 0)
+	return solve(0, 0)
 }
 
 // ----------------------------------Priority queue---------------------------------------
