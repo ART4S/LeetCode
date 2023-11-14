@@ -1,4 +1,44 @@
 func minCostConnectPoints(points [][]int) int {
+	return minCostConnectPoints_kruskal(points)
+}
+
+func minCostConnectPoints_kruskal(points [][]int) int {
+	type edge struct {
+		pointFrom int
+		pointTo   int
+		cost      int
+	}
+
+	n := len(points)
+
+	edges := make([]edge, 0)
+
+	for i := 0; i < n-1; i++ {
+		for j := i + 1; j < n; j++ {
+			cost := Abs(points[i][0]-points[j][0]) + Abs(points[i][1]-points[j][1])
+			edges = append(edges, edge{i, j, cost})
+		}
+	}
+
+	sort.Slice(edges, func(i, j int) bool {
+		return edges[i].cost < edges[j].cost
+	})
+
+	uf := NewUnionFind(n)
+
+	minCost := 0
+
+	for _, e := range edges {
+		if uf.GetParent(e.pointFrom) != uf.GetParent(e.pointTo) {
+			uf.Unite(e.pointFrom, e.pointTo)
+			minCost += e.cost
+		}
+	}
+
+	return minCost
+}
+
+func minCostConnectPoints_prim(points [][]int) int {
 	type edge struct {
 		pointTo int
 		cost    int
@@ -49,7 +89,6 @@ func minCostConnectPoints(points [][]int) int {
 
 	return minCost
 }
-
 
 // ----------------------------------Priority queue---------------------------------------
 type PriorityQueue[TKey any] interface {
@@ -138,27 +177,30 @@ func (this *priorityQueue[TKey]) swap(i, j int) {
 }
 
 // ----------------------------------Disjoint set---------------------------------------
-type DisjointSet interface {
+type UnionFind interface {
 	GetParent(x int) int
 	Unite(x int, y int)
 }
 
-type disjointSet struct {
+type unionFind struct {
 	parent []int
 	rank   []int
 }
 
-func NewDisjointSet(size int) DisjointSet {
-	var ds = &disjointSet{make([]int, size+1), make([]int, size+1)}
-
-	for i := 1; i <= size; i++ {
-		ds.parent[i] = i
+func NewUnionFind(size int) UnionFind {
+	var uf = &unionFind{
+		parent: make([]int, size+1),
+		rank:   make([]int, size+1),
 	}
 
-	return ds
+	for i := 1; i <= size; i++ {
+		uf.parent[i] = i
+	}
+
+	return uf
 }
 
-func (this *disjointSet) GetParent(x int) int {
+func (this *unionFind) GetParent(x int) int {
 	if this.parent[x] == x {
 		return x
 	}
@@ -170,7 +212,7 @@ func (this *disjointSet) GetParent(x int) int {
 	return newParent
 }
 
-func (this *disjointSet) Unite(x int, y int) {
+func (this *unionFind) Unite(x int, y int) {
 	parentX := this.GetParent(x)
 	parentY := this.GetParent(y)
 
