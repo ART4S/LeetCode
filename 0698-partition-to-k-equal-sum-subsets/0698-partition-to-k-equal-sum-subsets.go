@@ -27,17 +27,17 @@ func canPartitionKSubsets_dp(nums []int, k int) bool {
 
 	dp[0] = 0
 
-	for i := 0; i < allmask; i++ {
-		if dp[i] == -1 {
+	for mask := 0; mask < allmask; mask++ {
+		if dp[mask] == -1 {
 			continue
 		}
 
-		for j := 0; j < n; j++ {
-			if i&(1<<j) == 0 {
-				nexti := i | (1 << j)
-				nextsum := dp[i] + nums[j]
+		for i := 0; i < n; i++ {
+			if mask&(1<<i) == 0 {
+				nextmask := mask | (1 << i)
+				nextsum := dp[mask] + nums[i]
 				if nextsum <= targetSum {
-					dp[nexti] = nextsum % targetSum
+					dp[nextmask] = nextsum % targetSum
 				}
 			}
 		}
@@ -81,10 +81,10 @@ func canPartitionKSubsets_memo(nums []int, k int) bool {
 
 			for i := 0; i < n; i++ {
 				if mask&(1<<i) == 0 {
-					nexti := mask | (1 << i)
+					nextmask := mask | (1 << i)
 					nextsum := sum + nums[i]
 					if nextsum <= targetSum {
-						if solve(nexti, nextsum%targetSum) {
+						if solve(nextmask, nextsum%targetSum) {
 							memo[mask] = 1
 							break
 						}
