@@ -3,34 +3,30 @@ func threeSum(nums []int) [][]int {
 		return nums[i] < nums[j]
 	})
 
-	n := len(nums)
-
+    n := len(nums)
 	res := make([][]int, 0)
 
 	for i := 0; i < n - 2; i++ {
         if i != 0 && nums[i] == nums[i - 1] {
             continue
         }
-        
-		c := nums[i]
 
 		l := i + 1
 		r := n - 1
 
 		for l < r {
-			a := nums[l]
-			b := nums[r]
-
-			sum := a + b + c
-
+            sum := nums[i] + nums[l] + nums[r]
+            
 			if sum == 0 {
-				res = append(res, []int{a, b, c})
+                t := []int{nums[i], nums[l], nums[r]}
+                
+				res = append(res, t)
 
-				for l < r && nums[l] == a {
+				for l < r && nums[l] == t[1] {
 					l++
 				}
 
-				for l < r && nums[r] == b {
+				for l < r && nums[r] == t[2] {
 					r--
 				}
 			} else if sum > 0 {
