@@ -3,7 +3,7 @@ public class Solution {
     {
         var res = new List<string>();
 
-        var backtrack = new List<char>();
+        var bt = s.ToCharArray();
 
         dfs(0);
 
@@ -11,24 +11,25 @@ public class Solution {
 
         void dfs(int i)
         {
-            if (i == s.Length)
+            if (i == bt.Length)
             {
-                res.Add(new string(backtrack.ToArray()));
+                res.Add(new string(bt));
                 return;
             }
 
-            backtrack.Add(s[i]);
-            dfs(i + 1);
-            backtrack.RemoveAt(backtrack.Count - 1);
-
-            if (char.IsLetter(s[i]))
+            if (char.IsDigit(bt[i]))
             {
-                char newch = char.IsUpper(s[i]) ? char.ToLower(s[i]) : char.ToUpper(s[i]);
-
-                backtrack.Add(newch);
                 dfs(i + 1);
-                backtrack.RemoveAt(backtrack.Count - 1);
+                return;
             }
+
+            bt[i] = char.ToLower(bt[i]);
+
+            dfs(i + 1);
+
+            bt[i] = char.ToUpper(bt[i]);
+
+            dfs(i + 1);
         }
     }
 }
