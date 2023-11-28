@@ -1,6 +1,38 @@
 public class Solution {
     public IList<string> LetterCasePermutation(string s)
     {
+        return LetterCasePermutation_Queue(s);
+    }
+
+    private IList<string> LetterCasePermutation_Queue(string s)
+    {
+        var que = new Queue<string>();
+
+        que.Enqueue("");
+
+        foreach (var ch in s)
+        {
+            int qlen = que.Count;
+
+            while (qlen-- > 0)
+            {
+                var cur = que.Dequeue();
+
+                if (char.IsDigit(ch))
+                    que.Enqueue(cur + ch);
+                else
+                {
+                    que.Enqueue(cur + char.ToLower(ch));
+                    que.Enqueue(cur + char.ToUpper(ch));
+                }
+            }
+        }
+
+        return que.ToArray();
+    }
+
+    private IList<string> LetterCasePermutation_Backtracking(string s)
+    {
         var res = new List<string>();
 
         var bt = s.ToCharArray();
