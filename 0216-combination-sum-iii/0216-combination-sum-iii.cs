@@ -5,7 +5,7 @@ public class Solution {
 
         var res = new List<IList<int>>();
 
-        var backtrack = new List<int>();
+        var bt = new List<int>();
 
         var nums = new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
@@ -15,11 +15,11 @@ public class Solution {
 
         void dfs(int i, int sum)
         {
-            if (backtrack.Count >= k || sum >= n || i == nums.Length)
+            if (bt.Count >= k || sum >= n || i == nums.Length)
             {
-                if (backtrack.Count == k && sum == n)
+                if (bt.Count == k && sum == n)
                 {
-                    res.Add(backtrack.ToArray());
+                    res.Add(bt.ToArray());
                 }
                 
                 return;
@@ -27,9 +27,9 @@ public class Solution {
 
             dfs(i + 1, sum);
 
-            backtrack.Add(nums[i]);
+            bt.Add(nums[i]);
             dfs(i + 1, sum + nums[i]);
-            backtrack.RemoveAt(backtrack.Count - 1);
+            bt.RemoveAt(bt.Count - 1);
         }
     }
 }
