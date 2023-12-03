@@ -1,6 +1,12 @@
 public class Solution {
     public bool SearchMatrix(int[][] matrix, int target)
     {
+        return SearchMatrix_Traverse(matrix, target);
+    }
+
+    // nlog(n)
+    private bool SearchMatrix_BinSearch(int[][] matrix, int target)
+    {
         foreach (var row in matrix)
         {
             int l = 0;
@@ -23,5 +29,27 @@ public class Solution {
         }
 
         return false;
+    }
+
+    // n + m
+    private bool SearchMatrix_Traverse(int[][] matrix, int target)
+    {
+        int n = matrix.Length;
+        int m = matrix[0].Length;
+
+        int i = 0;
+        int j = m - 1;
+
+        while (true)
+        {
+            if (matrix[i][j] == target) return true;
+
+            if (matrix[i][j] > target && j > 0)
+                j--;
+            else if (matrix[i][j] < target && i < n - 1)
+                i++;
+            else
+                return false;
+        }
     }
 }
