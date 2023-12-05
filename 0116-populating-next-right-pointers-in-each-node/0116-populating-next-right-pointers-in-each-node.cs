@@ -1,6 +1,34 @@
 public class Solution {
     public Node? Connect(Node? root)
     {
+        return Connect_LinkedList(root);
+    }
+
+    private Node? Connect_LinkedList(Node? root)
+    {
+        var res = root;
+
+        var fakenode = new Node();
+
+        while (root?.left != null)
+        {
+            var prev = fakenode;
+
+            for (var cur = root; cur != null; cur = cur.next)
+            {
+                prev.next = cur.left;
+                cur.left.next = cur.right;
+                prev = cur.right;
+            }
+
+            root = root.left;
+        }
+
+        return res;
+    }
+
+    private Node? Connect_BFS(Node? root)
+    {
         if (root == null) return null;
 
         var que = new Queue<Node>();
