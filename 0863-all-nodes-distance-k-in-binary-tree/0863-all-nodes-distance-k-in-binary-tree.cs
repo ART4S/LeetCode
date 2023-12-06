@@ -128,35 +128,21 @@ public class Solution {
                     adjList.Add(cur.val, curAdj);
                 }
 
-                if (cur.left != null)
+                foreach (var next in new[]{ cur.left, cur.right })
                 {
-                    if (!adjList.TryGetValue(cur.left.val, out var leftAdj))
-                    {
-                        leftAdj = new List<int>();
+                    if (next == null) continue;
 
-                        adjList.Add(cur.left.val, leftAdj);
+                    if (!adjList.TryGetValue(next.val, out var nextAdj))
+                    {
+                        nextAdj = new List<int>();
+
+                        adjList.Add(next.val, nextAdj);
                     }
 
-                    curAdj.Add(cur.left.val);
-                    leftAdj.Add(cur.val);
+                    curAdj.Add(next.val);
+                    nextAdj.Add(cur.val);
 
-                
-                    que.Enqueue(cur.left);
-                }
-
-                if (cur.right != null)
-                {
-                    if (!adjList.TryGetValue(cur.right.val, out var rightAdj))
-                    {
-                        rightAdj = new List<int>();
-
-                        adjList.Add(cur.right.val, rightAdj);
-                    }
-
-                    curAdj.Add(cur.right.val);
-                    rightAdj.Add(cur.val);
-
-                    que.Enqueue(cur.right);
+                    que.Enqueue(next);
                 }
             }
 
