@@ -53,21 +53,21 @@ public class Solution {
         {
             int n = que.Count;
 
-            var prev = fake;
+            var level = fake;
 
             while (n-- > 0)
             {
-                var cur = que.Dequeue();
+                var node = que.Dequeue();
 
-                prev.next = cur;
+                level.next = node;
 
-                prev = cur;
+                level = node;
 
-                if (cur.left != null)
-                    que.Enqueue(cur.left);
+                if (node.left != null)
+                    que.Enqueue(node.left);
 
-                if (cur.right != null)
-                    que.Enqueue(cur.right);
+                if (node.right != null)
+                    que.Enqueue(node.right);
             }
         }
 
