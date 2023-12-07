@@ -1,6 +1,41 @@
 public class Solution {
     public int PathSum(TreeNode root, int targetSum)
     {
+        return PathSum_PrefixSumDict(root, targetSum);
+    }
+
+    private int PathSum_PrefixSumDict(TreeNode root, int targetSum)
+    {
+        int res = 0;
+
+        dfs(root, 0, new Dictionary<long, int>() { [0] = 1 });
+
+        return res;
+
+        void dfs(TreeNode? root, long sum, Dictionary<long, int> prefixSum)
+        {
+            if (root == null) return;
+
+            sum += root.val;
+
+            if (prefixSum.TryGetValue(sum - targetSum, out var freq))
+            {
+                res += freq;
+            }
+
+            prefixSum.TryAdd(sum, 0);
+            
+            prefixSum[sum]++;
+
+            dfs(root.left, sum, prefixSum);
+            dfs(root.right, sum, prefixSum);
+
+            prefixSum[sum]--;
+        }
+    }
+
+    private int PathSum_PrefixSumList(TreeNode root, int targetSum)
+    {
         int res = 0;
 
         dfs(root, new List<long>());
