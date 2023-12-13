@@ -2,9 +2,9 @@ public class Solution {
     public int MaxProfit(int[] prices) {
         int profit = 0;
 
-        for(int i = 0; i < prices.Length - 1; i++)
+        for(int i = 1; i < prices.Length; i++)
         {
-            profit += Math.Max(prices[i + 1] - prices[i], 0);
+            profit += Math.Max(prices[i] - prices[i - 1], 0);
         }
 
         return profit;
