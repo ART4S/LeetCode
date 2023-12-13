@@ -1,10 +1,10 @@
 public class Solution {
     public void GameOfLife(int[][] board)
     {
-        GameOfLife_State(board);
+        GameOfLife_Bit(board);
     }
 
-    private void GameOfLife_State(int[][] board)
+    private void GameOfLife_Bit(int[][] board)
     {
         int n = board.Length;
         int m = board[0].Length;
@@ -14,8 +14,6 @@ public class Solution {
 
         const int dead = 0;
         const int live = 1;
-        const int live_dead = 2;
-        const int dead_live = 3;
 
         for (int i = 0; i < n; i++)
         {
@@ -28,25 +26,15 @@ public class Solution {
                     var ni = i + di[d];
                     var nj = j + dj[d];
 
-                    if (ni >= 0 && ni < n && nj >= 0 && nj < m && board[ni][nj] is live or live_dead)
+                    if (ni >= 0 && ni < n && nj >= 0 && nj < m && (board[ni][nj] & live) == live)
                     {
                         liveNeighbours++;
                     }
                 }
 
-                if (board[i][j] is live && liveNeighbours is < 4 and > 1 || board[i][j] is dead && liveNeighbours is 3)
+                if (board[i][j] == live && liveNeighbours is < 4 and > 1 || board[i][j] == dead && liveNeighbours is 3)
                 {
-                    if (board[i][j] is dead)
-                    {
-                        board[i][j] = dead_live;
-                    }
-                }
-                else
-                {
-                    if (board[i][j] == live)
-                    {
-                        board[i][j] = live_dead;
-                    }
+                    board[i][j] |= live << 1;
                 }
             }
         }
@@ -55,14 +43,14 @@ public class Solution {
         {
             for (int j = 0; j < m; j++)
             {
-                if (board[i][j] is live or dead_live)
+                if (((board[i][j] >> 1) & live) == live)
                     board[i][j] = live;
                 else
                     board[i][j] = dead;
             }
         }
     }
-    
+
     private void GameOfLife_Matrix(int[][] board)
     {
         int n = board.Length;
