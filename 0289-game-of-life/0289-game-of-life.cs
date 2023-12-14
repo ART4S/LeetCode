@@ -43,10 +43,7 @@ public class Solution {
         {
             for (int j = 0; j < m; j++)
             {
-                if (((board[i][j] >> 1) & live) == live)
-                    board[i][j] = live;
-                else
-                    board[i][j] = dead;
+                board[i][j] >>= 1;
             }
         }
     }
