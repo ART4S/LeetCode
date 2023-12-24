@@ -1,29 +1,29 @@
 public class Solution {
     public int[] FindDiagonalOrder(IList<IList<int>> nums)
     {
-        return FindDiagonalOrder_Queue(nums);
-    }
+        var que = new Queue<int[]>();
 
-    private int[] FindDiagonalOrder_Queue(IList<IList<int>> nums)
-    {
-        var que = new Queue<(int i, int j)>();
-
-        que.Enqueue((0, 0));
+        que.Enqueue(new []{0, 0});
 
         var res = new List<int>();
 
         while (que.TryDequeue(out var cur))
         {
-            res.Add(nums[cur.i][cur.j]);
+            int i = cur[0];
+            int j = cur[1];
 
-            if (cur.i + 1 < nums.Count && cur.j == 0)
+            res.Add(nums[i][j]);
+
+            if (i + 1 < nums.Count && j == 0)
             {
-                que.Enqueue(cur with { i = cur.i + 1 });
+                que.Enqueue(new []{ i + 1, j });
             }
 
-            if (cur.j + 1 < nums[cur.i].Count)
+            if (j + 1 < nums[i].Count)
             {
-                que.Enqueue(cur with { j = cur.j + 1 });
+                cur[1]++;
+
+                que.Enqueue(cur);
             }
         }
 
