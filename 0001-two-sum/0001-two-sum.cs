@@ -1,29 +1,21 @@
 public class Solution {
-    public int[] TwoSum(int[] nums, int target)
-    {
-        var arr = nums.Select((x, i) => (Index: i, Value: x)).OrderBy(x => x.Value).ToArray();
+    public int[] TwoSum(int[] nums, int target) {
+        var res = new int[2];
+        var map = new Dictionary<int, int>();
 
-        int i = 0;
-        int j = arr.Length - 1;
-
-        while (i < j)
+        for(int i = 0; i < nums.Length; i++)
         {
-            var sum = arr[i].Value + arr[j].Value;
+            if (map.TryGetValue(target - nums[i], out var j))
+            {
+                res[0] = i;
+                res[1] = j;
+                
+                break;
+            }
 
-            if (sum > target)
-            {
-                j--;
-            }
-            else if (sum < target)
-            {
-                i++;
-            }
-            else
-            {
-                return new[] { arr[i].Index, arr[j].Index };
-            }
+            map[nums[i]] = i;
         }
 
-        return Array.Empty<int>();
+        return res;
     }
 }
