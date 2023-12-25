@@ -7,7 +7,7 @@ public class Solution {
 
         bool flag = false;
 
-        for (int i = 31; i > 0; i--, left <<= 1, right <<= 1)
+        for (int i = 1; i < 32; i++, left <<= 1, right <<= 1)
         {
             num <<= 1;
 
@@ -25,7 +25,6 @@ public class Solution {
             {
                 flag = true;
             }
-
         }
 
         return num;
