@@ -1,13 +1,31 @@
 public class Solution {
-    public int SingleNumber(int[] nums)
-    {
-        var x = 0;
+    public int SingleNumber(int[] nums) {
+        return SingleNumber_Xor(nums);
+    }
 
-        foreach(var n in nums)
+    private int SingleNumber_Xor(int[] nums) {
+        var xor = 0;
+
+        foreach (var num in nums)
         {
-            x ^= n;
+            xor ^= num;
         }
 
-        return x;
+        return xor;
+    }
+
+    private int SingleNumber_HashSet(int[] nums)
+    {
+        var hs = new HashSet<int>();
+
+        foreach (var num in nums)
+        {
+            if (!hs.Add(num))
+            {
+                hs.Remove(num);
+            }
+        }
+
+        return hs.First();
     }
 }
