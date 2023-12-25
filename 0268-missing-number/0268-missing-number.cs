@@ -1,7 +1,21 @@
 public class Solution {
     public int MissingNumber(int[] nums) 
     {
-        return MissingNumber_Xor(nums);
+        return MissingNumber_ArithmeticProgression(nums);
+    }
+
+    private int MissingNumber_ArithmeticProgression(int[] nums) 
+    {
+        int n = nums.Length;
+        int asum = (1 + n) * n / 2;
+        int sum = 0;
+
+        foreach(var num in nums)
+        {
+            sum += num;
+        }
+
+        return asum - sum;
     }
 
     private int MissingNumber_Xor(int[] nums) 
