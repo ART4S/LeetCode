@@ -1,7 +1,31 @@
 public class Solution {
     public int FindPairs(int[] nums, int k)
     {
-        return FindPairs_HashSet(nums, k);
+        return FindPairs_MapCount(nums, k);
+    }
+
+    // n
+    private int FindPairs_MapCount(int[] nums, int k)
+    {
+        var count = new Dictionary<int, int>();
+
+        foreach (var num in nums)
+        {
+            count.TryAdd(num, 0);
+            count[num]++;
+        }
+
+        int res = 0;
+
+        foreach(var num in count.Keys)
+        {
+            if (count.TryGetValue(num + k, out var cnt) && (k != 0 || cnt > 1))
+            {
+                res++;
+            }
+        }
+
+        return res;
     }
 
     // n
