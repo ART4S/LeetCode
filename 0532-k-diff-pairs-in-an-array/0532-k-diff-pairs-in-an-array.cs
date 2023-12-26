@@ -1,7 +1,7 @@
 public class Solution {
     public int FindPairs(int[] nums, int k)
     {
-        return FindPairs_MapCount(nums, k);
+        return FindPairs_BinarySearch(nums, k);
     }
 
     // n
@@ -64,6 +64,40 @@ public class Solution {
         }
 
         return vis.Count;
+    }
+
+    // n logn
+    private int FindPairs_BinarySearch(int[] nums, int k) 
+    {
+        int n = nums.Length;
+
+        Array.Sort(nums);
+
+        int res = 0;
+
+        for(int i = 0; i < n - 1; i++)
+        {
+            if (i > 0 && nums[i] == nums[i - 1]) continue;
+
+            int l = i + 1;
+            int r = n - 1;
+
+            while (l < r)
+            {
+                int m = l + (r - l) / 2;
+
+                int x = nums[m] - nums[i];
+
+                if (x < k)
+                    l = m + 1;
+                else
+                    r = m;
+            }
+
+            if (nums[l] - nums[i] == k) res++;
+        }  
+
+        return res;
     }
 
     // n^2
