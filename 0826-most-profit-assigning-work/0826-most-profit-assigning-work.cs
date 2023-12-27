@@ -4,7 +4,7 @@ public class Solution {
         return MaxProfitAssignment_DP(difficulty, profit, worker);
     }
 
-    // max(difficulty, worker)
+    // max(d, w)
     private int MaxProfitAssignment_DP(int[] difficulty, int[] profit, int[] worker)
     {
         int n = worker.Length;
