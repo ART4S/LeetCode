@@ -13,17 +13,9 @@ public class Solution {
         for (int i = 0, l = 0, r = n - 1; i < n; i++)
         {
             if (n1sorted[i] > n2sorted[l].Num)
-            {
-                nums1[n2sorted[l].Ind] = n1sorted[i];
-
-                l++;
-            }
+                nums1[n2sorted[l++].Ind] = n1sorted[i];
             else
-            {
-                nums1[n2sorted[r].Ind] = n1sorted[i];
-
-                r--;
-            }
+                nums1[n2sorted[r--].Ind] = n1sorted[i];
         }
 
         return nums1;
