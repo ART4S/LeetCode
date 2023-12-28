@@ -24,27 +24,22 @@ public class Solution {
                 {
                     while (l < r)
                     {
-                        res[l] = res[l - 1];
-                        res[r] = res[r + 1];
-
-                        l++;
-                        r--;
+                        res[l++] = 'R';
+                        res[r--] = 'L';
                     }
                 }
                 else if (res[l - 1] == 'R')
                 {
                     while (l <= r)
                     {
-                        res[l] = res[l - 1];
-                        l++;
+                        res[l++] = 'R';
                     }
                 }
                 else if (res[r + 1] == 'L')
                 {
                     while (l <= r)
                     {
-                        res[r] = res[r + 1];
-                        r--;
+                        res[r--] = 'L';
                     }
                 }
             }
