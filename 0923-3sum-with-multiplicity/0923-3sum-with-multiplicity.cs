@@ -1,7 +1,7 @@
 public class Solution {
     public int ThreeSumMulti(int[] arr, int target)
     {
-        return ThreeSumMulti_TwoPointers(arr, target);
+        return ThreeSumMulti_HashSet(arr, target);
     }
 
     // n^2
@@ -103,7 +103,7 @@ public class Solution {
                     }
                 }
                 else if (a == b)
-                    count = map[c] * map[a] * (map[a] - 1) / 2;
+                    count = map[c] * map[a] * (map[a] - 1) / 2 % mod;
                 else if (a == c)
                     count = map[b] * map[a] * (map[a] - 1) / 2;
                 else if (b == c)
