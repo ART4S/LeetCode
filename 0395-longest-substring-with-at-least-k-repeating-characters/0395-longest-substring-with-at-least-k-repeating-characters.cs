@@ -8,15 +8,15 @@ public class Solution
     // n
     private int LongestSubstring_SlidingWindow(string s, int k)
     {
-        int len = 0;
+        var len = 0;
 
         for (int max_unique = 1; max_unique <= 26; max_unique++)
         {
-            int l = 0;
-            int r = 0;
+            var l = 0;
+            var r = 0;
             var count = new int[26];
-            int count_k = 0;
-            int count_unique = 0;
+            var count_k = 0;
+            var count_unique = 0;
 
             while (r < s.Length)
             {
@@ -112,13 +112,13 @@ public class Solution
     // n^2
     private int LongestSubstring_BruteForce(string s, int k)
     {
-        int len = 0;
+        var len = 0;
 
         for (int i = 0; i < s.Length; i++)
         {
             var count = new int[26];
-            int count_k = 0;
-            int count_unique = 0;
+            var count_k = 0;
+            var count_unique = 0;
 
             for (int j = i; j < s.Length; j++)
             {
