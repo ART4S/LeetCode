@@ -1,15 +1,15 @@
 public class Solution {
     public int NumberOfSubarrays(int[] nums, int k)
     {
-        return NumberOfSubarrays_TwoPointers(nums, k);
+        return NumberOfSubarrays_SlidingWindow(nums, k);
     }
 
     // n
-    private int NumberOfSubarrays_TwoPointers(int[] nums, int k)
+    private int NumberOfSubarrays_SlidingWindow(int[] nums, int k)
     {
         int n = nums.Length;
         int odd = 0;
-        int evenBefore = 0;
+        int even_before_window = 0;
         int res = 0;
 
         for (int i = 0, j = 0; i < n; i++)
@@ -20,7 +20,7 @@ public class Solution {
             {
                 j++;
                 odd--;
-                evenBefore = 0;
+                even_before_window = 0;
             }
 
             if (odd == k)
@@ -28,10 +28,10 @@ public class Solution {
                 while (j < i && nums[j] % 2 == 0)
                 {
                     j++;
-                    evenBefore++;
+                    even_before_window++;
                 }
 
-                res += evenBefore + 1;
+                res += even_before_window + 1;
             }
         }
 
@@ -39,7 +39,7 @@ public class Solution {
     }
 
     // n
-    private int NumberOfSubarrays_PrefixSum(int[] nums, int k)
+    private int NumberOfSubarrays_PrefSum(int[] nums, int k)
     {
         var pref_sum = new Dictionary<int, int>() { [0] = 1 };
 
